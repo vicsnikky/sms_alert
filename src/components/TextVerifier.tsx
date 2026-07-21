@@ -48,7 +48,23 @@ export default function TextVerifier({
       });
 
       if (!response.ok) {
-        throw new Error("Text analysis failed. Please check your connection.");
+        let errMsg = `Server returned status ${response.status}`;
+        try {
+          const errData = await response.json();
+          if (errData && errData.error) {
+            errMsg = errData.error;
+          } else if (errData && errData.errorDetails) {
+            errMsg = `${errData.errorDetails}`;
+          }
+        } catch (e) {
+          try {
+            const txt = await response.text();
+            if (txt) {
+              errMsg += `: ${txt.slice(0, 150)}`;
+            }
+          } catch (inner) {}
+        }
+        throw new Error(errMsg);
       }
 
       const data = await response.json();

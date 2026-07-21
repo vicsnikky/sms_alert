@@ -1,0 +1,6 @@
+{
+  "name": "Fake Alert Detection System",
+  "description": "An intelligent full-stack security platform for detecting fraudulent bank alerts, forged transaction receipts, and spoofed SMS notifications using advanced OCR analytics, heuristics, and multi-modal Gemini AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

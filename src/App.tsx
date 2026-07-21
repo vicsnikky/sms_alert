@@ -7,6 +7,7 @@ import ImageAnalyzer from "./components/ImageAnalyzer";
 import TextVerifier from "./components/TextVerifier";
 import AlertSandbox from "./components/AlertSandbox";
 import EducationalResources from "./components/EducationalResources";
+import { apiClient } from "./utils/apiClient";
 
 type TabType = "dashboard" | "receipt" | "sms" | "resources";
 
@@ -36,19 +37,17 @@ export default function App() {
   // Load backend stats & history logs
   const loadSystemState = async () => {
     try {
-      const [healthRes, historyRes] = await Promise.all([
-        fetch("/api/health"),
-        fetch("/api/history")
+      const [healthData, historyData] = await Promise.all([
+        apiClient.getHealth(),
+        apiClient.getHistory()
       ]);
 
-      if (healthRes.ok) {
-        const healthData = await healthRes.json();
+      if (healthData) {
         setStats(healthData.stats);
         setApiKeyConfigured(healthData.apiKeyConfigured);
       }
 
-      if (historyRes.ok) {
-        const historyData = await historyRes.json();
+      if (historyData) {
         setHistory(historyData);
       }
     } catch (error) {

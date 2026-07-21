@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { Upload, FileImage, ShieldAlert, Sparkles, Check, ChevronRight, Eye, AlertCircle, RefreshCw, Layers } from "lucide-react";
 import { SAMPLE_ALERTS, BANK_PROFILES } from "../data/samples";
 import { AnalysisReport, SampleAlert } from "../types";
+import { apiClient } from "../utils/apiClient";
 
 export default function ImageAnalyzer({
   onAddHistory,
@@ -89,37 +90,7 @@ export default function ImageAnalyzer({
     setReport(null);
 
     try {
-      const response = await fetch("/api/analyze-receipt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imageBase64: base64Data,
-          mimeType: fileMime,
-          textContext: contextText
-        })
-      });
-
-      if (!response.ok) {
-        let errMsg = `Server returned status ${response.status}`;
-        try {
-          const errData = await response.json();
-          if (errData && errData.error) {
-            errMsg = errData.error;
-          } else if (errData && errData.errorDetails) {
-            errMsg = `${errData.errorDetails}`;
-          }
-        } catch (e) {
-          try {
-            const txt = await response.text();
-            if (txt) {
-              errMsg += `: ${txt.slice(0, 150)}`;
-            }
-          } catch (inner) {}
-        }
-        throw new Error(errMsg);
-      }
-
-      const data = await response.json();
+      const data = await apiClient.analyzeReceipt(base64Data, fileMime, contextText);
       setReport(data.report);
       setActiveEngine(data.engine);
       onAddHistory(); // refresh parent statistics

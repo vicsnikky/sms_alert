@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Sparkles, RefreshCw, ClipboardList, CheckCircle2, AlertOctagon, HelpCircle, AlertCircle } from "lucide-react";
 import { SAMPLE_ALERTS } from "../data/samples";
 import { AnalysisReport, SampleAlert } from "../types";
+import { apiClient } from "../utils/apiClient";
 
 export default function TextVerifier({
   onAddHistory,
@@ -41,33 +42,7 @@ export default function TextVerifier({
     setReport(null);
 
     try {
-      const response = await fetch("/api/analyze-text", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: inputText })
-      });
-
-      if (!response.ok) {
-        let errMsg = `Server returned status ${response.status}`;
-        try {
-          const errData = await response.json();
-          if (errData && errData.error) {
-            errMsg = errData.error;
-          } else if (errData && errData.errorDetails) {
-            errMsg = `${errData.errorDetails}`;
-          }
-        } catch (e) {
-          try {
-            const txt = await response.text();
-            if (txt) {
-              errMsg += `: ${txt.slice(0, 150)}`;
-            }
-          } catch (inner) {}
-        }
-        throw new Error(errMsg);
-      }
-
-      const data = await response.json();
+      const data = await apiClient.analyzeText(inputText);
       setReport(data.report);
       setActiveEngine(data.engine);
       onAddHistory(); // Sync statistics in root App

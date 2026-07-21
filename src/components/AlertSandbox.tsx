@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Play, RotateCcw, AlertTriangle, ShieldCheck, HelpCircle, Code, Settings } from "lucide-react";
 import { BANK_PROFILES } from "../data/samples";
 import { SandboxConfig } from "../types";
+import { apiClient } from "../utils/apiClient";
 
 export default function AlertSandbox() {
   const [config, setConfig] = useState<SandboxConfig>({
@@ -54,17 +55,7 @@ export default function AlertSandbox() {
 
     try {
       // Step 1: Request sandbox compiler to generate a counterfeit receipt based on rules
-      const generateRes = await fetch("/api/generate-sandbox-receipt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ config })
-      });
-
-      if (!generateRes.ok) {
-        throw new Error("Sandbox generator failed.");
-      }
-
-      const simData = await generateRes.json();
+      const simData = await apiClient.generateSandboxReceipt(config);
       setSimulatedResult(simData.generatedReceipt);
 
       // Step 2: Push the generated mockup directly into our validation pipeline to see if we catch it!
@@ -76,16 +67,8 @@ Ref: ${simData.generatedReceipt.ref}
 Date: ${simData.generatedReceipt.date}
 ${config.flawType === 'SPELLING' ? 'Transfer Sucessful' : 'Transfer Successful'}`;
 
-      const analyzeRes = await fetch("/api/analyze-text", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: normalizedSms })
-      });
-
-      if (analyzeRes.ok) {
-        const checkData = await analyzeRes.json();
-        setForensicVerdict(checkData.report);
-      }
+      const checkData = await apiClient.analyzeText(normalizedSms);
+      setForensicVerdict(checkData.report);
     } catch (error: any) {
       console.error(error);
       alert("Error processing sandbox request: " + error.message);

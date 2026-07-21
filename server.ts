@@ -287,7 +287,7 @@ app.post("/api/analyze-text", async (req, res) => {
     try {
       const response = await withTimeout(
         ai.models.generateContent({
-          model: "gemini-3.5-flash",
+          model: "gemini-3.1-flash-lite",
           contents: `Analyze this transactional text copy-paste or bank alert message for fake patterns.
 Assess if it looks like an authentic transaction alert or a spoofed, fake notification made by a scammer.
 Input message to inspect:
@@ -394,7 +394,7 @@ app.post("/api/analyze-receipt", async (req, res) => {
 
       const response = await withTimeout(
         ai.models.generateContent({
-          model: "gemini-3.5-flash",
+          model: "gemini-3.1-flash-lite",
           contents: [imagePart, textPart],
           config: {
             systemInstruction: "You are a senior digital forensics engineer specializing in commercial fintech receipt verification. Perform deep visual and text OCR analyses. Look for pixelation on text lines, irregular fonts, overlapping, unaligned headers, fake reference ID formatting, and balance anomalies. Respond STRICTLY in the JSON format requested.",
